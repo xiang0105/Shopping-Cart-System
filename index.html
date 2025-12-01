@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>web01</title>
+    <link rel="stylesheet" href="./style/fontawesome.css">
+    <link rel="stylesheet" href="./style/style.css">
+</head>
+
+<body>
+    <div id="app">
+        <div id="market">
+            <div id="categories">
+                <div class="category" :class="currentCategory == null && 'active'" @click="currentCategory = null;">所有商品</div>
+                <div class="category" v-for="category, index in categories" :class="currentCategory == index && 'active'" @click="currentCategory = index;">{{category.name}}</div>
+                <div class="search"><i class="fa-solid fa-filter"></i><input type="text" v-model="filter" placeholder="輸入關鍵字、成份"></div>
+            </div>
+            <div id="good-list">
+                <div class="good-item" v-for="good in filteredGoods">
+                    <img class="good-item-image" :src="good.image" alt="good.name">
+                    <div class="good-item-name">{{ good.name }}</div>
+                    <div class="good-item-actions">
+                        <button class="good-item-check" @click="currentGood = good.index; openDetail = true;">查看商品</button>
+                        <button class="good-item-remove" v-if="cart[good.index]" @click="cart[good.index] = 0;">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                        <button class="good-item-add" v-else @click="cart[good.index] = 1;">
+                            <i class="fas fa-cart-shopping"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div id="good-detail" :class="openDetail && 'show'">
+                <button class="good-detail-close" @click="openDetail = false;"><i
+                        class="fas fa-angle-left"></i></button>
+                <img class="good-detail-image" :src="goods[currentGood].image" alt="goods[currentGood].name">
+                <div class="good-detail-information">
+                    <div class="good-detail-name">{{ goods[currentGood].name }}</div>
+                    <div class="good-detail-price">{{ goods[currentGood].price }}元 / {{ goods[currentGood].unit }}</div>
+                    <div class="good-detail-ingredients">成份：{{ goods[currentGood].ingredients.join('、') }}。</div>
+                    <div class="good-detail-introduction">{{ goods[currentGood].introduction }}</div>
+                    <div class="good-detail-action" v-if="cart[currentGood]">
+                        <input type="number" class="good-detail-count" min="1" :max="goods[currentGood].stock"
+                            v-model="cart[currentGood]">
+                        <button class="good-item-remove" @click="cart[currentGood] = 0;">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                    <button class="good-item-add" v-else @click="cart[currentGood] = 1;">
+                        <i class="fas fa-cart-shopping"></i> 加入購物車
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div id="order-detail">
+            <div class="order-header">您的訂單</div>
+            <div class="order-body">
+                <template v-for="good, index in goods">
+                    <div class="order-item" v-if="cart[index]">
+                        <img class="order-item-image" :src="good.image" alt="good.name">
+                        <div class="order-detail">
+                            <div class="order-item-name">{{ good.name }}</div>
+                            <div class="order-item-cost">{{ good.price }} &times; {{ cart[index] }} = {{ good.price *
+                                cart[index] }} 元</div>
+                        </div>
+                        <button class="good-item-check small" @click="currentGood = index; openDetail = true;">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </button>
+                        <button class="good-item-remove small" @click="cart[index] = 0;">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                </template>
+            </div>
+            <div class="order-footer">
+                總計：{{ total }} 元
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
+
+<script type="module" src="./index.js" async></script>
